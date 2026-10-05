@@ -74,7 +74,11 @@ and managed-file synchronization. Configure it through
 the managed workflow. Existing organization Apps are reused; no new credentials
 are provisioned by this baseline.
 
-The security caller is pinned to hub release `v0.0.21` and deliberately selects
+Secret scanning, secret-scanning push protection, extended Python CodeQL
+analysis, and private vulnerability reporting are enabled for this public
+repository. These checks supplement, rather than replace, native validation.
+
+The security caller is pinned to hub release `v0.0.22` and deliberately selects
 `hub_ref: dev` for the development action layout. `dev` remains the default
 development branch. `main` holds the verified repository baseline and is
 protected by reviews, required checks, and conversation resolution. It is not

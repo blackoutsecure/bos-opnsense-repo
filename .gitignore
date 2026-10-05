@@ -1,21 +1,8 @@
 # Local development environments and caches.
 .vscode/
-.idea/
-.venv/
 venv/
-__pycache__/
-*.py[cod]
-.pytest_cache/
-.ruff_cache/
-.mypy_cache/
-.coverage
-coverage.xml
-htmlcov/
 
 # Credentials and signing material must never be tracked.
-.env
-.env.*
-!.env.example
 .secrets/
 secrets.*
 !SECRETS.md
@@ -37,5 +24,56 @@ secrets.*
 
 # Local logs and operating-system files.
 *.log
+
+# >>> managed-file-sync:common >>>
+# OS + editor noise
 .DS_Store
 Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Build + dependency output
+node_modules/
+dist/
+build/
+coverage/
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local secrets (never commit these)
+.env
+.env.*
+!.env.example
+# <<< managed-file-sync:common <<<
+
+# >>> managed-file-sync:coverage_artifacts >>>
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+# <<< managed-file-sync:coverage_artifacts <<<
+
+# >>> managed-file-sync:python_ecosystem >>>
+**/__pycache__/
+**/.venv/
+**/venv/
+**/env/
+**/.pytest_cache/
+**/.ruff_cache/
+**/.mypy_cache/
+**/.tox/
+**/.nox/
+**/.coverage
+**/coverage.xml
+**/htmlcov/
+*$py.class
+*.egg
+*.egg-info/
+.eggs/
+# <<< managed-file-sync:python_ecosystem <<<

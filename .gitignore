@@ -1,0 +1,41 @@
+# Local development environments and caches.
+.vscode/
+.idea/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Credentials and signing material must never be tracked.
+.env
+.env.*
+!.env.example
+.secrets/
+secrets.*
+!SECRETS.md
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Native build outputs and generated package repositories.
+/build/
+/dist/
+/artifacts/
+*.pkg
+*.txz
+*.tzst
+*.tar
+*.tar.gz
+
+# Local logs and operating-system files.
+*.log
+.DS_Store
+Thumbs.db

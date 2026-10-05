@@ -1,0 +1,53 @@
+name: OPNsense Lab Validation
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: opnsense-lab-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repository-contracts:
+    name: Repository contracts (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Validate repository contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/validate_repository.py
+          python -m unittest discover -s tests -v
+      - name: Report validation scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            printf '## OPNsense lab validation scope\n\n'
+            printf -- '- Repository contracts: PASS\n'
+            printf -- '- FreeBSD package build and signing: Not Assessed\n'
+            printf -- '- OPNsense installation, upgrade, and rollback: Not Assessed\n'
+            printf -- '- Cloudflare publication: Not Assessed\n'
+          } >> "${GITHUB_STEP_SUMMARY}"

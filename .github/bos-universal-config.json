@@ -1,0 +1,71 @@
+{
+  "organization": {
+    "runners": {
+      "default": "ubuntu-latest",
+      "x64": "ubuntu-latest",
+      "arm64": "ubuntu-24.04-arm"
+    },
+    "defaults": {
+      "timeout_minutes": 30
+    },
+    "reporting": {
+      "enable_job_summary": true,
+      "enable_annotations": true,
+      "title_prefix": "Blackout Secure OPNsense Lab",
+      "fail_on": "fail"
+    },
+    "kicker_fanout": {
+      "enabled_kickers": ["gatekeeper"]
+    }
+  },
+  "launchpad": {
+    "stages": {
+      "docker": false,
+      "balena": false,
+      "github_release": false,
+      "companion_docker": false,
+      "cloudflare_pages": false
+    },
+    "security_scan": {
+      "enable": true,
+      "fail_on": "fail",
+      "blocks_release": true
+    },
+    "repo_metadata": {
+      "enable": false
+    }
+  },
+  "gate": {
+    "enable_lint": true,
+    "enable_dependency_review": true,
+    "enable_code_scan": true,
+    "enable_pinned_actions_check": true,
+    "enable_pr_title_check": true,
+    "enable_readme_header_check": true,
+    "enable_python_lint": true,
+    "node_lint_mode": "auto",
+    "python_lint_mode": "auto",
+    "shell_lint_mode": "auto",
+    "python_version": "3.11",
+    "code_scan_fail_on": "fail"
+  },
+  "marketplace": {
+    "enabled": false
+  },
+  "managed_file_sync": {
+    "services": [
+      "common",
+      "lf_line_endings",
+      "editorconfig",
+      "markdownlint",
+      "yamllint",
+      "shellcheck",
+      "coverage_artifacts",
+      "license_service",
+      "security_readme_pointer",
+      "bos_universal_gatekeeper_kicker",
+      "python_ecosystem",
+      "dependabot_actions"
+    ]
+  }
+}

@@ -2,17 +2,40 @@ name: OPNsense Lab Security
 
 on:
   push:
-    branches: [dev]
+    branches: [dev, main]
   pull_request:
-    branches: [dev]
+    branches: [dev, main]
   merge_group:
 
 permissions:
   contents: read
 
 jobs:
-  security:
+  security-dev:
     name: security (dev)
+    if: >-
+      (github.event_name == 'push' && github.ref_name == 'dev')
+      || (github.event_name == 'pull_request' && github.base_ref == 'dev')
+      || (github.event_name == 'merge_group' && endsWith(github.event.merge_group.base_ref, '/dev'))
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      security-events: write
+    uses: blackoutsecure/bos-automation-hub/.github/workflows/bos-universal-security.yml@f210407fec9c82b54180785a83c7500a4413e642 # v0.0.21
+    with:
+      hub_ref: dev
+      config_authoritative: true
+    secrets:
+      scanning_pat: ${{ secrets.SCANNING_PAT }}
+      GATEWALL_APP_PRIVATE_KEY: ${{ secrets.GATEWALL_APP_PRIVATE_KEY }}
+
+  security-main:
+    name: security (main)
+    if: >-
+      (github.event_name == 'push' && github.ref_name == 'main')
+      || (github.event_name == 'pull_request' && github.base_ref == 'main')
+      || (github.event_name == 'merge_group' && endsWith(github.event.merge_group.base_ref, '/main'))
     permissions:
       contents: read
       actions: read

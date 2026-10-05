@@ -183,8 +183,9 @@ Not Assessed until exercised on explicitly selected native platform versions.
 ## Automation Ownership
 
 Configure hub integration through `.github/bos-universal-config.json`.
-Do not hand-edit the hub-managed gatekeeper kicker. This starter is
-development-only; publishing is intentionally off. Do not enable it without
+Do not hand-edit the hub-managed gatekeeper kicker. `dev` is the default
+development branch; `main` holds a protected repository baseline, not a
+released plugin. Publishing is intentionally off. Do not enable it without
 native validation, a signing design, and a tested rollback path.
 
 Read [the baseline documentation](docs/repository-baseline.md) before extending

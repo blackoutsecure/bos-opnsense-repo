@@ -2,9 +2,9 @@ name: OPNsense Lab Validation
 
 on:
   push:
-    branches: [dev]
+    branches: [dev, main]
   pull_request:
-    branches: [dev]
+    branches: [dev, main]
   merge_group:
 
 permissions:

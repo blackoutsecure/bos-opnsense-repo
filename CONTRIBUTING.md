@@ -8,6 +8,8 @@ Read [AGENTS.md](AGENTS.md) and
 Work on `dev` or a feature branch targeting `dev`. Use conventional-commit
 titles for pull requests. Do not create a stable release or move a version tag
 as part of routine development.
+Updates to protected `main` require a pull request, passing checks, review,
+and resolved conversations. A baseline on `main` is not a package release.
 
 Use an isolated FreeBSD development host or OPNsense lab instance. Prefer
 `pkg`, `rc.d`, FreeBSD networking, and the OPNsense MVC framework. Never assume

@@ -75,9 +75,10 @@ the managed workflow. Existing organization Apps are reused; no new credentials
 are provisioned by this baseline.
 
 The security caller is pinned to hub release `v0.0.21` and deliberately selects
-`hub_ref: dev` for the development action layout. `dev` is the only supported
-development branch at bootstrap. No stable branch, version tag, package release,
-or production promotion is created.
+`hub_ref: dev` for the development action layout. `dev` remains the default
+development branch. `main` holds the verified repository baseline and is
+protected by reviews, required checks, and conversation resolution. It is not
+a released plugin or package. No version tag or product release is created.
 
 All delivery stages remain off. Future artifacts must publish to Cloudflare R2
 and GitHub Releases; documentation must publish to Cloudflare Pages. Prefer the
@@ -87,6 +88,8 @@ Cloudflare CDN and Workers over equivalent custom infrastructure.
 
 Repository upgrades happen through reviewed commits on `dev`. Use a reverting
 commit for a repository rollback; never move a released version tag.
+Update protected `main` through a pull request only, after its repository
+contract and `security (main) / Security summary` checks pass.
 
 Plugin and package upgrades and rollback are **Not Assessed**. Before the first
 release, select supported OPNsense and FreeBSD versions and ABIs, implement

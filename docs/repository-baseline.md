@@ -2,10 +2,15 @@
 
 ## Overview
 
-This feature establishes a development-only FreeBSD and OPNsense lab. It
+This feature establishes a FreeBSD and OPNsense development lab. It
 provides repository instructions, plugin documentation scaffolds, offline
 contracts, and GitHub Actions integration. It does not implement plugin
 behavior or publish deployable artifacts.
+
+`dev` is the default development branch. Protected `main` contains the verified
+repository baseline only; it does not establish a supported plugin or package
+release. Promote repository changes through reviewed pull requests and keep
+native artifact publication off until the acceptance requirements are met.
 
 ## Architecture
 

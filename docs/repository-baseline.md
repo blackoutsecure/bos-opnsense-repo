@@ -43,10 +43,13 @@ The repository's GitHub settings complement the offline contracts:
 
 - `dev` is the default branch and rejects force pushes, branch deletion, and
   merge commits. Administrators must follow these protections.
-- `dev` deliberately permits ordinary fast-forward commits because the
-  managed hub sync commits directly. It does not require PR reviews or status
-  checks for every push. Human changes should still go through reviewed PRs.
-- `main` additionally requires a code-owner review, resolution of review
+- The active `OPNsense dev review and CI` ruleset requires a code-owner review,
+  resolution of review conversations, an up-to-date branch, both
+  repository-contract matrix checks, and `security (dev) / Security summary`.
+  Only the existing Gatewall App is exempt from this review/check ruleset,
+  preserving its managed fast-forward sync commits. It is not exempt from
+  the independent history protections. No App permissions or secrets are added.
+- `main` requires a code-owner review, resolution of review
   conversations, an up-to-date branch, both repository-contract matrix checks,
   and `security (main) / Security summary`. Never bypass these requirements.
 - Actions tokens default to read-only access and cannot approve PR reviews.
@@ -66,6 +69,12 @@ job verifies the integration.
 The gatekeeper workflow remains hub-owned. Dependabot changes to its pins must
 be incorporated into the canonical hub template and then synchronized, not
 merged only into this repository where the next sync would overwrite them.
+
+The current posture scanner reads classic branch protection rather than the
+effective ruleset combination. It can therefore report PS021/PS023 for `dev`
+despite the active review/check ruleset. Verify that ruleset and GitHub's
+effective branch rules when reviewing these findings; do not disable the
+security gate or weaken the actual protections to silence them.
 
 These are repository controls, not native release evidence. GitHub settings
 and credential validity require live verification; the offline validator

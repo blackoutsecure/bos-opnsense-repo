@@ -31,11 +31,16 @@ managed-file reconciliation. Existing Gatekeeper credentials authorize
 dispatches; existing Gatewall credentials perform purpose-scoped repository
 automation. The baseline does not add App permissions or credential scope.
 
-The published hub's `main` action tree still uses the nested layout while its
-security workflow expects development action paths. This lab therefore
-explicitly selects `hub_ref: dev` for development validation. This is not a
-production-runtime promotion. Recheck the promoted runtime before adding a
-stable-branch caller.
+At pinned hub release `v0.0.22`, the
+[action tree](https://github.com/blackoutsecure/bos-automation-hub/tree/b2e4faaa36c4d482737243a97415edc046ddde57/.github/actions/shared)
+uses `.github/actions/shared/`, while the
+[security workflow](https://github.com/blackoutsecure/bos-automation-hub/blob/b2e4faaa36c4d482737243a97415edc046ddde57/.github/workflows/bos-universal-security.yml)
+checks out and invokes `.github/actions/universal-config` without `shared/`.
+The lab therefore explicitly selects `hub_ref: dev` for action/config
+checkouts on both lab branches while keeping the workflow definition pinned.
+This is not a production-runtime promotion. Review the pinned workflow and
+its checkout ref together before switching to promoted action/config sources
+or enabling artifact publication.
 
 ## GitHub readiness
 

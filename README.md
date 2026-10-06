@@ -86,12 +86,14 @@ The security caller is pinned to hub release `v0.0.22` and deliberately selects
 the eleven conventional PR-title types as separate lines, matching the title
 action's input format without disabling or relaxing that gate.
 
-`dev` remains the default development branch. It rejects force pushes,
-deletion, and merge commits while allowing the hub's managed fast-forward
-sync commits. `main` holds the verified repository baseline and additionally
-requires reviews, required checks, and conversation resolution. Administrators
-are subject to both branches' protections. This is not a released plugin or
-package. No version tag or product release is created.
+`dev` remains the default development branch. Both long-lived branches reject
+force pushes, deletion, and merge commits and require code-owner reviews,
+current validation/security checks, and conversation resolution. Administrators
+are not exempt. Only the existing Gatewall App can bypass `dev`'s review/check
+ruleset for repository automation; its fast-forward sync commits remain subject
+to the independent history protections. There is no corresponding bypass on
+`main`. This is not a released plugin or package. No version tag or product
+release is created.
 
 All delivery stages remain off. Future artifacts must publish to Cloudflare R2
 and GitHub Releases; documentation must publish to Cloudflare Pages. Prefer the

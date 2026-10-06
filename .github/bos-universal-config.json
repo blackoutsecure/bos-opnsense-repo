@@ -41,6 +41,7 @@
     "enable_code_scan": true,
     "enable_pinned_actions_check": true,
     "enable_pr_title_check": true,
+    "pr_title_types": "feat\nfix\ndocs\nstyle\nrefactor\nperf\ntest\nbuild\nci\nchore\nrevert",
     "enable_readme_header_check": true,
     "enable_python_lint": true,
     "node_lint_mode": "auto",

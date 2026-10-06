@@ -60,6 +60,27 @@ class RepositoryContractTests(unittest.TestCase):
     def test_actual_repository(self) -> None:
         self.assertEqual(validate_repository(REPOSITORY_ROOT), [])
 
+    def test_pr_title_types_are_individual_multiline_entries(self) -> None:
+        policy = json.loads(
+            (REPOSITORY_ROOT / ".github/bos-universal-config.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            policy["gate"]["pr_title_types"].splitlines(),
+            [
+                "feat",
+                "fix",
+                "docs",
+                "style",
+                "refactor",
+                "perf",
+                "test",
+                "build",
+                "ci",
+                "chore",
+                "revert",
+            ],
+        )
+
     def test_valid_fixture(self) -> None:
         create_plugin(self.root)
         self.assertEqual(validate_repository(self.root), [])

@@ -37,6 +37,40 @@ explicitly selects `hub_ref: dev` for development validation. This is not a
 production-runtime promotion. Recheck the promoted runtime before adding a
 stable-branch caller.
 
+## GitHub readiness
+
+The repository's GitHub settings complement the offline contracts:
+
+- `dev` is the default branch and rejects force pushes, branch deletion, and
+  merge commits. Administrators must follow these protections.
+- `dev` deliberately permits ordinary fast-forward commits because the
+  managed hub sync commits directly. It does not require PR reviews or status
+  checks for every push. Human changes should still go through reviewed PRs.
+- `main` additionally requires a code-owner review, resolution of review
+  conversations, an up-to-date branch, both repository-contract matrix checks,
+  and `security (main) / Security summary`. Never bypass these requirements.
+- Actions tokens default to read-only access and cannot approve PR reviews.
+  Existing workflows request any required write permissions per job.
+- Dependency graph/review, Dependabot alerts and security updates, secret
+  scanning and push protection, non-provider patterns and validity checks,
+  extended Python CodeQL analysis, and private reporting are enabled.
+- Squash or rebase merges preserve linear history. Merged short-lived branches
+  are deleted automatically; the protected long-lived branches are retained.
+
+The pinned hub release passes `gate.pr_title_types` directly to the semantic
+PR-title action, which expects a multiline string rather than CSV. The
+repository explicitly configures all eleven existing conventional types in
+that format. An offline regression test checks the entries; the live PR title
+job verifies the integration.
+
+The gatekeeper workflow remains hub-owned. Dependabot changes to its pins must
+be incorporated into the canonical hub template and then synchronized, not
+merged only into this repository where the next sync would overwrite them.
+
+These are repository controls, not native release evidence. GitHub settings
+and credential validity require live verification; the offline validator
+neither configures settings nor verifies stored secrets.
+
 ## Installation
 
 Clone the `dev` branch onto a development host with Python 3.11 or later and

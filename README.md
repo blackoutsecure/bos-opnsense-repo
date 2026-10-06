@@ -74,11 +74,26 @@ and managed-file synchronization. Configure it through
 the managed workflow. Existing organization Apps are reused; no new credentials
 are provisioned by this baseline.
 
-The security caller is pinned to hub release `v0.0.21` and deliberately selects
-`hub_ref: dev` for the development action layout. `dev` remains the default
-development branch. `main` holds the verified repository baseline and is
-protected by reviews, required checks, and conversation resolution. It is not
-a released plugin or package. No version tag or product release is created.
+Dependency review, Dependabot alerts and security updates, secret scanning
+with push protection, non-provider patterns and validity checks, extended
+Python CodeQL analysis, and private vulnerability reporting are enabled for
+this public repository. Actions tokens default to read-only access; write
+permissions remain explicit and job-scoped. These checks supplement, rather
+than replace, native validation.
+
+The security caller is pinned to hub release `v0.0.22` and deliberately selects
+`hub_ref: dev` for the development action layout. Repository policy supplies
+the eleven conventional PR-title types as separate lines, matching the title
+action's input format without disabling or relaxing that gate.
+
+`dev` remains the default development branch. Both long-lived branches reject
+force pushes, deletion, and merge commits and require code-owner reviews,
+current validation/security checks, and conversation resolution. Administrators
+are not exempt. Only the existing Gatewall App can bypass `dev`'s review/check
+ruleset for repository automation; its fast-forward sync commits remain subject
+to the independent history protections. There is no corresponding bypass on
+`main`. This is not a released plugin or package. No version tag or product
+release is created.
 
 All delivery stages remain off. Future artifacts must publish to Cloudflare R2
 and GitHub Releases; documentation must publish to Cloudflare Pages. Prefer the

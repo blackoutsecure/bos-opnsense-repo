@@ -22,7 +22,7 @@ jobs:
       actions: read
       pull-requests: read
       security-events: write
-    uses: blackoutsecure/bos-automation-hub/.github/workflows/bos-universal-security.yml@b2e4faaa36c4d482737243a97415edc046ddde57 # v0.0.22
+    uses: blackoutsecure/bos-automation-hub/.github/workflows/bos-universal-security.yml@b6d6a7bc3c12c1faef4add039fabc49d7cc1ec6a # v0.0.25
     with:
       hub_ref: dev
       config_authoritative: true
@@ -41,7 +41,7 @@ jobs:
       actions: read
       pull-requests: read
       security-events: write
-    uses: blackoutsecure/bos-automation-hub/.github/workflows/bos-universal-security.yml@b2e4faaa36c4d482737243a97415edc046ddde57 # v0.0.22
+    uses: blackoutsecure/bos-automation-hub/.github/workflows/bos-universal-security.yml@b6d6a7bc3c12c1faef4add039fabc49d7cc1ec6a # v0.0.25
     with:
       hub_ref: dev
       config_authoritative: true

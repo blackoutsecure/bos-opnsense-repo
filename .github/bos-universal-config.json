@@ -67,6 +67,7 @@
       "bos_universal_gatekeeper_kicker",
       "python_ecosystem",
       "dependabot_actions"
-    ]
+    ],
+    "disabled_services": ["dependabot_pip"]
   }
 }

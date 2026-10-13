@@ -17,6 +17,7 @@ REQUIRED_DIRECTORIES = (
     "scripts",
     "tests",
 )
+POLICY_FILE = ".github/bos-universal-config.json"
 REQUIRED_FILES = (
     "AGENTS.md",
     "README.md",
@@ -24,8 +25,7 @@ REQUIRED_FILES = (
     "CONTRIBUTING.md",
     "SECURITY.md",
     "LICENSE",
-    ".github/copilot-instructions.md",
-    ".github/bos-universal-config.json",
+    POLICY_FILE,
     ".github/workflows/lab-validation.yml",
     ".github/workflows/security.yml",
     ".github/workflows/bos-universal-gatekeeper-kicker.yml",
@@ -65,8 +65,11 @@ def _reject_constant(value: str) -> NoReturn:
 
 def _file_errors(root: Path, relative: str) -> list[str]:
     path = root / relative
-    if any(parent.is_symlink() for parent in (path, *path.parents) if parent != root):
-        return [f"{relative!r}: required files and their parents must not be symlinks"]
+    for candidate in (path, *path.parents):
+        if candidate == root:
+            break
+        if candidate.is_symlink():
+            return [f"{relative!r}: required files and their parents must not be symlinks"]
     if not path.is_file():
         return [f"{relative!r}: required file is missing"]
     try:
@@ -75,17 +78,17 @@ def _file_errors(root: Path, relative: str) -> list[str]:
         return [f"{relative!r}: cannot read UTF-8 file: {exc}"]
     if not content.strip():
         return [f"{relative!r}: required file is empty"]
-    return []
+    return _policy_errors(content) if relative == POLICY_FILE else []
 
 
-def _policy_errors(path: Path) -> list[str]:
+def _policy_errors(content: str) -> list[str]:
     try:
         payload: object = json.loads(
-            path.read_text(encoding="utf-8"),
+            content,
             object_pairs_hook=_unique_object,
             parse_constant=_reject_constant,
         )
-    except (OSError, UnicodeError, ValueError) as exc:
+    except ValueError as exc:
         return [f"Repository policy cannot be loaded: {exc}"]
     if not _is_json_object(payload):
         return ["Repository policy must be a JSON object"]
@@ -162,10 +165,6 @@ def validate_repository(root: Path) -> list[str]:
     for relative in REQUIRED_FILES:
         errors.extend(_file_errors(root, relative))
     errors.extend(_plugin_errors(root))
-
-    policy = ".github/bos-universal-config.json"
-    if not _file_errors(root, policy):
-        errors.extend(_policy_errors(root / policy))
     return errors
 
 

@@ -1,10 +1,4 @@
-# Managed by Blackout Secure. Best practices applied via marketplace config, customized in sync-files/config/managed-file-sync-global-config.json and .github/bos-universal-config.json.
-# Starter template, safe to customize. This file is only ever created, never overwritten.
 root = true
-
-
-
-
 
 # >>> managed-file-sync:editorconfig >>>
 [*]

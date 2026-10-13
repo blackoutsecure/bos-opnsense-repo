@@ -1,8 +1,5 @@
-# Local development environments and caches.
 .vscode/
-venv/
 
-# Credentials and signing material must never be tracked.
 .secrets/
 secrets.*
 !SECRETS.md
@@ -12,9 +9,6 @@ secrets.*
 *.p12
 *.pfx
 
-# Native build outputs and generated package repositories.
-/build/
-/dist/
 /artifacts/
 *.pkg
 *.txz
@@ -22,7 +16,6 @@ secrets.*
 *.tar
 *.tar.gz
 
-# Local logs and operating-system files.
 *.log
 
 # >>> managed-file-sync:common >>>

@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 from scripts.validate_repository import (
     PLUGIN_FILES,
+    POLICY_FILE,
     PUBLISH_STAGES,
     REQUIRED_DIRECTORIES,
     REQUIRED_FILES,
@@ -38,7 +39,7 @@ def create_fixture(root: Path) -> None:
         },
         "gate": gate,
     }
-    (root / ".github/bos-universal-config.json").write_text(json.dumps(policy), encoding="utf-8")
+    (root / POLICY_FILE).write_text(json.dumps(policy), encoding="utf-8")
 
 
 def create_plugin(root: Path, name: str = "os-blackoutsecure-fixture") -> Path:
@@ -55,15 +56,13 @@ class RepositoryContractTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         create_fixture(self.root)
-        self.policy = self.root / ".github/bos-universal-config.json"
+        self.policy = self.root / POLICY_FILE
 
     def test_actual_repository(self) -> None:
         self.assertEqual(validate_repository(REPOSITORY_ROOT), [])
 
     def test_pr_title_types_are_individual_multiline_entries(self) -> None:
-        policy = json.loads(
-            (REPOSITORY_ROOT / ".github/bos-universal-config.json").read_text(encoding="utf-8")
-        )
+        policy = json.loads((REPOSITORY_ROOT / POLICY_FILE).read_text(encoding="utf-8"))
         self.assertEqual(
             policy["gate"]["pr_title_types"].splitlines(),
             [
@@ -84,6 +83,22 @@ class RepositoryContractTests(unittest.TestCase):
     def test_valid_fixture(self) -> None:
         create_plugin(self.root)
         self.assertEqual(validate_repository(self.root), [])
+
+    def test_copilot_instructions_are_optional(self) -> None:
+        instructions = self.root / ".github" / "copilot-instructions.md"
+        instructions.write_text("Read AGENTS.md for repository policy.\n", encoding="utf-8")
+        self.assertEqual(validate_repository(self.root), [])
+        instructions.unlink()
+        self.assertEqual(validate_repository(self.root), [])
+
+    def test_canonical_agent_instructions_remain_required(self) -> None:
+        (self.root / "AGENTS.md").unlink()
+        self.assertIn("'AGENTS.md': required file is missing", validate_repository(self.root))
+
+    def test_repository_policy_is_read_once(self) -> None:
+        with patch.object(Path, "read_text", autospec=True, side_effect=Path.read_text) as read:
+            self.assertEqual(validate_repository(self.root), [])
+        self.assertEqual(sum(call.args[0] == self.policy for call in read.call_args_list), 1)
 
     def test_missing_required_directory(self) -> None:
         (self.root / "packages").rmdir()
@@ -112,6 +127,27 @@ class RepositoryContractTests(unittest.TestCase):
         plugin = create_plugin(self.root)
         self.assert_symlink_is_rejected(plugin / "README.md")
 
+    def test_repository_root_symlink_is_rejected(self) -> None:
+        self.assert_symlink_is_rejected(self.root)
+
+    def test_required_document_parent_symlink_is_rejected(self) -> None:
+        self.assert_symlink_is_rejected(self.root / "docs")
+
+    def test_policy_directory_symlink_is_rejected(self) -> None:
+        self.assert_symlink_is_rejected(self.root / ".github")
+
+    def test_symlink_above_repository_root_is_allowed(self) -> None:
+        def is_symlink(path: Path) -> bool:
+            return path == self.root.parent
+
+        with patch.object(
+            Path,
+            "is_symlink",
+            autospec=True,
+            side_effect=is_symlink,
+        ):
+            self.assertEqual(validate_repository(self.root), [])
+
     def assert_symlink_is_rejected(self, link: Path) -> None:
         def is_symlink(path: Path) -> bool:
             return path == link
@@ -123,6 +159,19 @@ class RepositoryContractTests(unittest.TestCase):
         self.policy.write_text("{", encoding="utf-8")
         self.assertTrue(
             any("cannot be loaded" in error for error in validate_repository(self.root))
+        )
+
+    def test_invalid_utf8_policy_is_rejected(self) -> None:
+        self.policy.write_bytes(b"\xff")
+        self.assertTrue(
+            any("cannot read UTF-8 file" in error for error in validate_repository(self.root))
+        )
+
+    def test_unreadable_required_files_are_reported(self) -> None:
+        with patch.object(Path, "read_text", side_effect=PermissionError("permission denied")):
+            errors = validate_repository(self.root)
+        self.assertTrue(
+            any("cannot read UTF-8 file: permission denied" in error for error in errors)
         )
 
     def test_duplicate_json_keys(self) -> None:
@@ -155,32 +204,45 @@ class RepositoryContractTests(unittest.TestCase):
                 )
 
     def test_publishing_guard_fails_closed(self) -> None:
-        for value in ("true", '"false"', "null", "0"):
-            with self.subTest(value=value):
-                create_fixture(self.root)
-                content = self.policy.read_text(encoding="utf-8").replace(
-                    '"docker": false', f'"docker": {value}'
-                )
-                self.policy.write_text(content, encoding="utf-8")
-                errors = validate_repository(self.root)
-                self.assertTrue(any("stages.docker must be false" in error for error in errors))
+        for stage in PUBLISH_STAGES:
+            for value in ("true", '"false"', "null", "0"):
+                with self.subTest(stage=stage, value=value):
+                    create_fixture(self.root)
+                    content = self.policy.read_text(encoding="utf-8").replace(
+                        f'"{stage}": false', f'"{stage}": {value}'
+                    )
+                    self.policy.write_text(content, encoding="utf-8")
+                    errors = validate_repository(self.root)
+                    self.assertTrue(
+                        any(f"stages.{stage} must be false" in error for error in errors)
+                    )
 
     def test_missing_publication_stage_fails_closed(self) -> None:
-        content = self.policy.read_text(encoding="utf-8").replace('"docker": false, ', "")
-        self.policy.write_text(content, encoding="utf-8")
-        self.assertTrue(any("stages.docker" in error for error in validate_repository(self.root)))
+        for stage in PUBLISH_STAGES:
+            with self.subTest(stage=stage):
+                create_fixture(self.root)
+                policy = json.loads(self.policy.read_text(encoding="utf-8"))
+                del policy["launchpad"]["stages"][stage]
+                self.policy.write_text(json.dumps(policy), encoding="utf-8")
+                self.assertTrue(
+                    any(f"stages.{stage}" in error for error in validate_repository(self.root))
+                )
 
     def test_security_gate_cannot_be_disabled(self) -> None:
-        content = self.policy.read_text(encoding="utf-8").replace(
-            '"enable_code_scan": true', '"enable_code_scan": false'
-        )
-        self.policy.write_text(content, encoding="utf-8")
-        self.assertTrue(
-            any(
-                "enable_code_scan must remain true" in error
-                for error in validate_repository(self.root)
-            )
-        )
+        for name in SECURITY_GATES:
+            for value in ("false", '"true"', "null", "1"):
+                with self.subTest(name=name, value=value):
+                    create_fixture(self.root)
+                    content = self.policy.read_text(encoding="utf-8").replace(
+                        f'"{name}": true', f'"{name}": {value}'
+                    )
+                    self.policy.write_text(content, encoding="utf-8")
+                    self.assertTrue(
+                        any(
+                            f"{name} must remain true" in error
+                            for error in validate_repository(self.root)
+                        )
+                    )
 
     def test_security_scan_cannot_be_nonblocking(self) -> None:
         content = self.policy.read_text(encoding="utf-8").replace(

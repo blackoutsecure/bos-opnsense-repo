@@ -5,51 +5,24 @@ Copyright (c) 2026 Blackout Secure | Apache License 2.0
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Made by BlackoutSecure](https://img.shields.io/badge/made%20by-BlackoutSecure-1f1f1f)](https://github.com/blackoutsecure)
 
-FreeBSD and OPNsense development laboratory for plugins, packages, integration
-testing, signed package repositories, and Cloudflare-hosted documentation.
+Development workspace for FreeBSD packages and OPNsense plugins.
 
-## Overview
+**This is a documentation and validation baseline, not an installable plugin
+or package repository.** There are no built packages, signing services, or
+live deployments.
 
-This repository currently contains a secure development baseline, plugin
-documentation scaffolds, and offline repository checks. It does **not** contain
-installable plugins, built packages, a signing service, or live deployments.
+## Status
 
-| Component | Current state |
-| --- | --- |
-| Repository contract checks | Implemented; not a native build |
-| `os-blackoutsecure-azure` | Planned documentation scaffold |
-| `os-blackoutsecure-cloudflare` | Planned documentation scaffold |
-| `os-blackoutsecure-observability` | Planned documentation scaffold |
-| FreeBSD builds and package signing | Not Assessed |
-| OPNsense installation, upgrade, and rollback | Not Assessed |
-| R2, CDN, Workers, and Pages publication | Not Assessed |
+The [Azure, Cloudflare, and observability plugin scaffolds](plugins/README.md)
+contain documentation and licenses only. FreeBSD builds, package signing,
+OPNsense installation, upgrades, rollback, and hosted publication are
+**Not Assessed**.
 
-Security, stability, maintainability, compatibility, and performance are the
-priorities, in that order. FreeBSD and OPNsense are the primary targets; Azure,
-Cloudflare, and Linux companion hosts are secondary integration targets.
+Do not install these scaffolds on a production firewall.
 
-## Architecture
+## Validate a checkout
 
-| Directory | Purpose |
-| --- | --- |
-| [packages/](packages/README.md) | Native package and repository publishing standards |
-| [plugins/](plugins/README.md) | OPNsense plugin documentation scaffolds |
-| [docs/](docs/README.md) | Architecture, readiness, and operating procedures |
-| [examples/](examples/README.md) | Rules for safe, non-secret examples |
-| [scripts/](scripts/README.md) | Standard-library-only offline validation |
-| [tests/](tests/test_validate_repository.py) | Repository contract and failure-path tests |
-
-Controllers orchestrate; models validate; views contain minimal logic; services
-hold business logic. Follow the official
-[OPNsense development documentation](https://docs.opnsense.org/development.html)
-and [plugin repository](https://github.com/opnsense/plugins).
-
-## Installation
-
-There is nothing to install on a firewall yet. Use an isolated development host
-or jail, not a production OPNsense system, for repository work.
-
-Clone the development branch and run the offline checks with Python 3.11 or later:
+Use Python 3.11 or later on a development host:
 
 ```sh
 git clone --branch dev https://github.com/blackoutsecure/bos-opnsense-repo.git
@@ -58,79 +31,34 @@ python3 scripts/validate_repository.py
 python3 -m unittest discover -s tests -v
 ```
 
-On a FreeBSD development host, use `pkg` if Python must be installed. Do not
-replace the Python runtime supplied by a production OPNsense installation.
-The validator has no third-party runtime dependencies or network requirements.
+The [offline validator and tests](scripts/README.md) use only the Python
+standard library and need no network or credentials. CI runs the checks on
+Python 3.11 and 3.14 alongside the hub's universal security gate. These checks
+do not certify native packages or firewall behavior.
 
-## CI/CD
+On FreeBSD, install development tools through `pkg`; do not replace a
+production OPNsense system's Python runtime.
 
-GitHub Actions runs offline checks on Python 3.11 and 3.14 and calls the hub's
-universal security gate. Linux-hosted contract checks do not certify FreeBSD
-packages or OPNsense behavior.
+## Development
 
-The hub-managed gatekeeper is the front door for authorized manual maintenance
-and managed-file synchronization. Configure it through
-[bos-universal-config.json](.github/bos-universal-config.json), not by editing
-the managed workflow. Existing organization Apps are reused; no new credentials
-are provisioned by this baseline.
+Work through reviewed changes on `dev`. Protected `main` holds the repository
+baseline, not a released plugin. Publication remains disabled until native
+builds, signing, installation, upgrade, and rollback have been validated.
 
-Dependency review, Dependabot alerts and security updates, secret scanning
-with push protection, non-provider patterns and validity checks, extended
-Python CodeQL analysis, and private vulnerability reporting are enabled for
-this public repository. Actions tokens default to read-only access; write
-permissions remain explicit and job-scoped. These checks supplement, rather
-than replace, native validation.
+- [Contributing](CONTRIBUTING.md): development and plugin requirements.
+- [Repository baseline](docs/repository-baseline.md): architecture, automation,
+  release-readiness gates, and recovery procedures.
+- [Package publishing](packages/README.md): native build and hosting requirements.
+- [Security policy](SECURITY.md): private vulnerability reporting.
 
-The security caller is pinned to hub release `v0.0.22` and deliberately selects
-`hub_ref: dev` for the development action layout. Repository policy supplies
-the eleven conventional PR-title types as separate lines, matching the title
-action's input format without disabling or relaxing that gate.
-
-`dev` remains the default development branch. Both long-lived branches reject
-force pushes, deletion, and merge commits and require code-owner reviews,
-current validation/security checks, and conversation resolution. Administrators
-are not exempt. Only the existing Gatewall App can bypass `dev`'s review/check
-ruleset for repository automation; its fast-forward sync commits remain subject
-to the independent history protections. There is no corresponding bypass on
-`main`. This is not a released plugin or package. No version tag or product
-release is created.
-
-All delivery stages remain off. Future artifacts must publish to Cloudflare R2
-and GitHub Releases; documentation must publish to Cloudflare Pages. Prefer the
-Cloudflare CDN and Workers over equivalent custom infrastructure.
-
-## Upgrade and rollback
-
-Repository upgrades happen through reviewed commits on `dev`. Use a reverting
-commit for a repository rollback; never move a released version tag.
-Update protected `main` through a pull request only, after its repository
-contract and `security (main) / Security summary` checks pass.
-
-Plugin and package upgrades and rollback are **Not Assessed**. Before the first
-release, select supported OPNsense and FreeBSD versions and ABIs, implement
-native build and signing gates, and test installation, upgrade, service
-recovery, and rollback on disposable native lab instances.
-
-See [the baseline operating procedure](docs/repository-baseline.md) for the
-architecture, readiness gates, upgrade procedure, and rollback procedure.
-
-## Security review
-
-The baseline has no plugin endpoints, external API clients, package-signing
-keys, or deployment credentials. Repository checks reject malformed policy,
-unsafe plugin documentation paths, disabled security controls, and accidental
-delivery enablement.
-
-This is a baseline hardening record, not a certification of future plugin code.
-Native runtime security and deployment behavior remain Not Assessed. Follow
-[SECURITY.md](SECURITY.md) for private vulnerability reporting and
-[CONTRIBUTING.md](CONTRIBUTING.md) for contribution requirements.
+Configure hub integration through
+[bos-universal-config.json](.github/bos-universal-config.json); do not hand-edit
+hub-managed workflows or blocks.
 
 ## License
 
-This repository uses the organization-standard [Apache License 2.0](LICENSE).
-Each plugin scaffold includes its own copy. Third-party licenses and notices
-must be reviewed before dependencies are redistributed.
+[Apache License 2.0](LICENSE). Review third-party licenses and notices before
+redistributing dependencies.
 
 <!-- >>> managed-file-sync:security_readme_pointer >>> -->
 ## Security & secrets

@@ -11,6 +11,12 @@ The validator checks required layout and files, plugin documentation, strict
 JSON policy, enabled security controls, and the baseline's explicit
 no-publication guard. Failure is reported on stderr with a non-zero exit code.
 
+Use `--root <checkout>` to validate a different checkout; by default the
+validator checks the repository containing the script. It reads policy once
+and rejects symlinked required paths within the checkout, not symlink
+ancestors outside it.
+Repository-wide policy is maintained in [AGENTS.md](../AGENTS.md).
+
 The tests cover both the actual repository and malformed or unsafe fixtures.
 No network, package installation, credentials, or third-party Python runtime
 dependencies are needed.

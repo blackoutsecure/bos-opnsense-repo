@@ -7,6 +7,8 @@ provides repository instructions, plugin documentation scaffolds, offline
 contracts, and GitHub Actions integration. It does not implement plugin
 behavior or publish deployable artifacts.
 
+The canonical repository-wide policy is [AGENTS.md](../AGENTS.md).
+
 `dev` is the default development branch. Protected `main` contains the verified
 repository baseline only; it does not establish a supported plugin or package
 release. Promote repository changes through reviewed pull requests and keep
@@ -18,9 +20,10 @@ Native source belongs under `plugins/`; package build and repository tooling
 belongs under `packages/` and `scripts/`. The three initial plugin directories
 contain documentation and licenses only.
 
-The offline validator reads repository policy and plugin documentation using
-the Python standard library. It does not execute plugin code, install software,
-call GitHub, contact Azure or Cloudflare, or read signing keys.
+The offline validator reads repository policy once and checks required files
+and plugin documentation using the Python standard library. It does not
+execute plugin code, install software, call GitHub, contact Azure or
+Cloudflare, or read signing keys.
 
 The validation workflow runs the validator and its tests on Linux-hosted
 Python 3.11 and 3.14. The separate security caller uses the hub's existing
@@ -134,7 +137,9 @@ No native rollback has been exercised by this baseline.
 - Pull-request code runs without persistent checkout credentials or deployment
   secrets in the repository-contract job.
 - Required plugin documentation must be regular, non-empty UTF-8 files.
-  Plugin-directory and required-document symlinks are rejected.
+  The checkout root, required directories, documents, and their parents inside
+  the checkout must not be symlinks. Ancestors outside the checkout may be
+  symlinks, allowing development paths such as FreeBSD's `/home` alias.
 - Repository policy rejects duplicate JSON keys, malformed objects, disabled
   security gates, and delivery stages that are not explicitly off.
 - The existing hub security workflow retains its policy gates and uses its

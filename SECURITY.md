@@ -15,7 +15,7 @@ contract check as a native compatibility or security certification.
 Follow the organization's
 [private vulnerability reporting policy](https://github.com/blackoutsecure/.github/blob/main/SECURITY.md).
 Use this repository's enabled
-[private reporting channel](https://github.com/blackoutsecure/bos-opnsense-repo/security/advisories/new).
+[private reporting channel](https://github.com/blackoutsecure/opnsense-lab/security/advisories/new).
 Do not put credentials, private keys, configuration backups, customer data,
 or unredacted exploit details in public issues.
 

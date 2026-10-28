@@ -52,8 +52,8 @@ or jail, not a production OPNsense system, for repository work.
 Clone the development branch and run the offline checks with Python 3.11 or later:
 
 ```sh
-git clone --branch dev https://github.com/blackoutsecure/bos-opnsense-repo.git
-cd bos-opnsense-repo
+git clone --branch dev https://github.com/blackoutsecure/opnsense-lab.git
+cd opnsense-lab
 python3 scripts/validate_repository.py
 python3 -m unittest discover -s tests -v
 ```
